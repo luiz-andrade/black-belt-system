@@ -1,0 +1,34 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: black-belt-app-prod
+    restart: always
+    ports:
+      - "8096:3000"
+    environment:
+      - DATABASE_URL=mysql://root:password@db:3306/blackbelt
+      # You should override these in production with a real .env file or environment variables
+      - NEXTAUTH_SECRET=supersecretkey-production
+      - NEXTAUTH_URL=http://localhost:8096
+      - TZ=America/Porto_Velho
+    depends_on:
+      - db
+    platform: linux/amd64
+
+  db:
+    image: mysql:8.0
+    container_name: black-belt-db-prod
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: blackbelt
+      TZ: America/Porto_Velho
+    ports:
+      - "3307:3306" # Mapped to 3307 to avoid conflict if dev is running on 3306
+    volumes:
+      - mysql_data_prod:/var/lib/mysql
+
+volumes:
+  mysql_data_prod:

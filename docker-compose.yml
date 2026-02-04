@@ -1,0 +1,35 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: black-belt-app
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=mysql://root:password@db:3306/blackbelt
+      # NextAuth / Auth secrets
+      - NEXTAUTH_SECRET=supersecretkey
+      - NEXTAUTH_URL=http://localhost:3000
+      - TZ=America/Porto_Velho
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    platform: linux/amd64
+
+  db:
+    image: mysql:8.0
+    container_name: black-belt-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: blackbelt
+      TZ: America/Porto_Velho
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:

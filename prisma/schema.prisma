@@ -1,0 +1,71 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  PROFESSOR
+  ADMIN
+}
+
+enum Belt {
+  WHITE
+  GREY
+  YELLOW
+  ORANGE
+  GREEN
+  BLUE
+  PURPLE
+  BROWN
+  BLACK
+}
+
+enum Project {
+  K5
+  BNH
+}
+
+model User {
+  id             Int       @id @default(autoincrement())
+  email          String    @unique
+  password       String
+  name           String
+  role           Role      @default(STUDENT)
+  
+  // Personal Info
+  birthDate      DateTime?
+  weight         Float?
+  phone          String?
+  emergencyPhone String?
+  responsibleName String?
+  
+  // JiuJitsu Info
+  belt           Belt?     @default(WHITE)
+  beltDegree     Int?      @default(0)
+  startDate      DateTime?
+  project        Project?
+  status         Boolean   @default(true)
+  history        String?   @db.Text
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  attendance     Attendance[]
+
+  @@map("users")
+}
+
+model Attendance {
+  id        Int      @id @default(autoincrement())
+  date      DateTime @default(now())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("attendance")
+}
